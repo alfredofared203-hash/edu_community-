@@ -12,6 +12,7 @@ import TeacherRating from "./pages/TeacherRating";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import MaterialsPage from "./features/materials/MaterialsPage";
+import SoftSkillsPage from "./features/softskils/SoftSkillsPage";
 import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -24,6 +25,9 @@ const App = () => <QueryClientProvider client={queryClient}><TooltipProvider><Au
 }<Route
   path="/materials"
   element={<ProtectedRoute><AppLayout><MaterialsPage /></AppLayout></ProtectedRoute>}
+/><Route
+  path="/soft-skills"
+  element={<AppLayout><SoftSkillsPage /></AppLayout>}
 /><Route
   path="/profile"
   element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>}
