@@ -5,26 +5,21 @@ const { authenticate, authorize } = require('../../middleware/auth.middleware');
 
  router.get('/', async (req, res, next) => {
   try {
-    // الثوابت الخاصة بالمعادلة المرجّحة
-    const m = 3;   // الحد الأدنى من التقييمات ليعطى المدرس وزناً ترشيحياً قوياً
-    const C = 4.0; // المتوسط العام الافتراضي لتقييمات الموقع ككل
-
+     const m = 3;    
+    const C = 4.0;  
     const teachers = await User.aggregate([
-      // 1. جلب المستخدمين الذين يملكون رتبة معلم فقط
-      {
+       {
         $match: { role: 'teacher' },
       },
-      // 2. ربط جدول المدرسين بجدول التقييمات
-      {
+       {
         $lookup: {
-          from: 'teacheratings', // تأكد أن الاسم مطابق لاسم الـ Collection في قاعدة البيانات
+          from: 'teacheratings',  
           localField: '_id',
           foreignField: 'teacherId',
           as: 'ratings',
         },
       },
-      // 3. حساب الحقول الأساسية: عدد التقييمات والمتوسط البسيط
-      {
+       {
         $addFields: {
           ratings_count: { $size: '$ratings' },
           avg_rating: {
@@ -36,8 +31,7 @@ const { authenticate, authorize } = require('../../middleware/auth.middleware');
           },
         },
       },
-      // 4. تطبيق معادلة التقييم المرجّح (Bayesian Average) لحساب الوزن الفعلي والترتيب العادل
-      {
+       {
         $addFields: {
           weighted_rating: {
             $divide: [
@@ -52,20 +46,17 @@ const { authenticate, authorize } = require('../../middleware/auth.middleware');
           }
         }
       },
-      // 5. الترتيب تنازلياً بناءً على التقييم المرجّح الجديد
-      {
+       {
         $sort: { weighted_rating: -1, ratings_count: -1 },
       },
-      // 6. تشكيل البيانات النهائية المطلوبة للـ Frontend
-      {
+       {
         $project: {
           id: '$_id',
           name: '$name',
           email: '$email',
           avg_rating: { $round: ['$avg_rating', 2] },
           ratings_count: 1,
-          weighted_rating: { $round: ['$weighted_rating', 2] }, // الحقل المرجّح مقرباً لرقمين
-        },
+          weighted_rating: { $round: ['$weighted_rating', 2] },  
       },
     ]);
 
@@ -75,8 +66,7 @@ const { authenticate, authorize } = require('../../middleware/auth.middleware');
   }
 });
 
-// Submit/Update rating for a teacher (يبقى كما هو بدون تغيير في منطقه)
-router.post('/:id/rate', authenticate, authorize('student'), async (req, res, next) => {
+ router.post('/:id/rate', authenticate, authorize('student'), async (req, res, next) => {
   try {
     const { rating, comment } = req.body;
     if (rating < 1 || rating > 5) return res.status(400).json({ error: 'تقييم غير صحيح' });
