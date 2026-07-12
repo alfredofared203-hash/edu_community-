@@ -8,18 +8,17 @@ const rateLimit = require('express-rate-limit');
 
 const env = require('./config/env');
 const connectDB = require('./config/db');
-require('./config/cloudinary'); // تهيئة Cloudinary (لو مضبوط)
+require('./config/cloudinary'); // تهيئة Cloudinary
 const { notFound, errorHandler } = require('./middleware/error.middleware');
 
 // مسارات الإصدار الأول (المعمار الجديد)
 const v1Routes = require('./routes/v1');
 
-// مسارات قديمة (لسه شغّالة — migration تدريجي)
+// مسارات قديمة (لسه شغّالة — تم ترحيل مسار المدرسين بنجاح)
 const postRoutes = require('./routes/post.routes');
 const challengeRoutes = require('./routes/challenge.routes');
 const leaderboardRoutes = require('./routes/leaderboard.routes');
-const teacherRoutes = require('./routes/teacher.routes');
-const adminRoutes = require('./routes/admin.routes');
+const adminRoutes = require('./routes/admin.routes'); // 👈 تم حذف استدعاء teacherRoutes من هنا
 
 connectDB();
 
@@ -46,14 +45,14 @@ app.get('/api/health', (req, res) =>
 );
 
 // ===== API v1 (المعمار الطبقي الجديد) =====
+// ⬇️ هذا المسار الآن يحتوي على /teachers تلقائياً عبر مجلد v1
 app.use('/api/v1', v1Routes);
 
 // ===== API قديم (يُهاجَر تدريجياً للإصدار v1) =====
 app.use('/api/posts', postRoutes);
 app.use('/api/challenges', challengeRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
-app.use('/api/teachers', teacherRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/admin', adminRoutes); // 👈 تم حذف app.use القديم للمدرسين من هنا
 
 
 // 404 + معالج الأخطاء المركزي (لازم في الآخر)
