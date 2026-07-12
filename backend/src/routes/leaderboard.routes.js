@@ -27,7 +27,7 @@ router.get('/', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Get top schools leaderboard
+
 router.get('/schools', async (req, res, next) => {
   try {
     const schools = await User.aggregate([

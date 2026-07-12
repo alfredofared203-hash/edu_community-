@@ -4,7 +4,7 @@ const Comment = require('../models/Comment');
 const { authenticate } = require('../middleware/auth.middleware');
 const upload = require('../middleware/upload.middleware');
 
-// Get posts
+
 router.get('/', async (req, res, next) => {
   try {
     const posts = await Post.find()
@@ -33,7 +33,7 @@ router.get('/', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Create post
+
 router.post('/', authenticate, upload.single('file'), async (req, res, next) => {
   try {
     const { content, subject } = req.body;
@@ -66,7 +66,7 @@ router.post('/', authenticate, upload.single('file'), async (req, res, next) => 
   } catch (e) { next(e); }
 });
 
-// Like / Unlike post
+
 router.post('/:id/like', authenticate, async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -83,7 +83,7 @@ router.post('/:id/like', authenticate, async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Get comments for a post
+
 router.get('/:id/comments', async (req, res, next) => {
   try {
     const comments = await Comment.find({ postId: req.params.id })
@@ -103,7 +103,7 @@ router.get('/:id/comments', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Add comment to post
+
 router.post('/:id/comments', authenticate, async (req, res, next) => {
   try {
     const { content } = req.body;

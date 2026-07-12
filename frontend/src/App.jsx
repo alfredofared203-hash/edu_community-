@@ -16,22 +16,38 @@ import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
+
 const queryClient = new QueryClient();
-const App = () => <QueryClientProvider client={queryClient}><TooltipProvider><AuthProvider><Toaster /><Sonner /><BrowserRouter><Routes><Route path="/" element={<Landing />} /><Route path="/auth" element={<Auth />} />{
-  /* أقسام عامة (تصفّح بدون تسجيل) */
-}<Route path="/feed" element={<AppLayout><Feed /></AppLayout>} /><Route path="/challenges" element={<AppLayout><Challenges /></AppLayout>} /><Route path="/leaderboard" element={<AppLayout><Leaderboard /></AppLayout>} /><Route path="/teachers" element={<AppLayout><TeacherRating /></AppLayout>} />{
-  /* أقسام تتطلب تسجيل دخول */
-}<Route
-  path="/materials"
-  element={<ProtectedRoute><AppLayout><MaterialsPage /></AppLayout></ProtectedRoute>}
-/><Route
-  path="/profile"
-  element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>}
-/><Route
-  path="/admin"
-  element={<ProtectedRoute roles={["admin"]}><AppLayout><AdminDashboard /></AppLayout></ProtectedRoute>}
-/><Route path="*" element={<NotFound />} /></Routes></BrowserRouter></AuthProvider></TooltipProvider></QueryClientProvider>;
-var App_default = App;
-export {
-  App_default as default
-};
+
+// ملاحظة: ده الـ baseline (الفيز الأولى والتانية). الفيز 3 و4 هيضيفهم التيم.
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/auth" element={<Auth />} />
+
+            {/* أقسام عامة (تصفّح بدون تسجيل) */}
+            <Route path="/feed" element={<AppLayout><Feed /></AppLayout>} />
+            <Route path="/challenges" element={<AppLayout><Challenges /></AppLayout>} />
+            <Route path="/leaderboard" element={<AppLayout><Leaderboard /></AppLayout>} />
+            <Route path="/teachers" element={<AppLayout><TeacherRating /></AppLayout>} />
+
+            {/* أقسام تتطلب تسجيل دخول */}
+            <Route path="/materials" element={<ProtectedRoute><AppLayout><MaterialsPage /></AppLayout></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute roles={["admin"]}><AppLayout><AdminDashboard /></AppLayout></ProtectedRoute>} />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;

@@ -6,7 +6,7 @@ const { authenticate, authorize } = require('../middleware/auth.middleware');
 
 router.use(authenticate, authorize('admin'));
 
-// Get system statistics for admin dashboard
+
 router.get('/stats', async (req, res, next) => {
   try {
     const usersByRoleAgg = await User.aggregate([
@@ -34,7 +34,7 @@ router.get('/stats', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// List users for admin dashboard
+
 router.get('/users', async (req, res, next) => {
   try {
     const users = await User.find()
@@ -56,7 +56,7 @@ router.get('/users', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Delete a user
+
 router.delete('/users/:id', async (req, res, next) => {
   try {
     await User.findByIdAndDelete(req.params.id);
