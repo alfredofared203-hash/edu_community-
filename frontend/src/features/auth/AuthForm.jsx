@@ -59,7 +59,7 @@ const AuthForm = () => {
         });
         toast.success("\u062A\u0645 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062D\u0633\u0627\u0628 \u0628\u0646\u062C\u0627\u062D");
       }
-      navigate("/materials");
+      navigate("/home");
     } catch (err) {
       toast.error(err.message || "\u0641\u0634\u0644\u062A \u0627\u0644\u0639\u0645\u0644\u064A\u0629");
     } finally {

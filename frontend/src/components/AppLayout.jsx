@@ -12,7 +12,8 @@ import {
   X,
   GraduationCap,
   LogOut,
-  BookOpen
+  BookOpen,
+  Sparkles
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 const AppLayout = ({ children }) => {
@@ -22,12 +23,14 @@ const AppLayout = ({ children }) => {
   const { user, logout } = useAuth();
   const navItems = [
     { path: "/feed", label: "\u0627\u0644\u0645\u062C\u062A\u0645\u0639", icon: MessageSquare },
+    { path: "/chat", label: "المحادثة", icon: MessageSquare },
     { path: "/materials", label: "\u0627\u0644\u0645\u0648\u0627\u062F \u0627\u0644\u062A\u0639\u0644\u064A\u0645\u064A\u0629", icon: BookOpen },
     { path: "/challenges", label: "\u0627\u0644\u062A\u062D\u062F\u064A\u0627\u062A", icon: Trophy },
     { path: "/leaderboard", label: "\u0627\u0644\u0645\u062A\u0635\u062F\u0631\u0648\u0646", icon: BarChart3 },
     { path: "/teachers", label: "\u062A\u0642\u064A\u064A\u0645 \u0627\u0644\u0645\u0639\u0644\u0645\u064A\u0646", icon: Star },
     { path: "/profile", label: "\u0645\u0644\u0641\u064A \u0627\u0644\u0634\u062E\u0635\u064A", icon: User },
-    ...user?.role === "admin" ? [{ path: "/admin", label: "\u0644\u0648\u062D\u0629 \u0627\u0644\u062A\u062D\u0643\u0645", icon: Shield }] : []
+    ...user?.role === "student" ? [{ path: "/softskills", label: "المهارات الحياتية", icon: Sparkles }] : [],
+    ...user?.role === "admin" ? [{ path: "/dashboard/admin", label: "\u0644\u0648\u062D\u0629 \u0627\u0644\u062A\u062D\u0643\u0645", icon: Shield }] : []
   ];
   const getRoleLabel = (role) => {
     switch (role) {
