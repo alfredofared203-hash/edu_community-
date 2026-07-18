@@ -1,57 +1,107 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { api } from "../lib/api";
+import { api, tokenStore } from "../lib/api";
 
 const AuthContext = createContext(undefined);
 
+const normalizeUser = (rawUser) => {
+  if (!rawUser) return null;
+  const userData = rawUser.user ?? rawUser;
+  if (!userData || typeof userData !== "object") return null;
+  return {
+    ...userData,
+    role: userData.role ? String(userData.role).toLowerCase() : userData.role,
+  };
+};
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);      // بيانات المستخدم الحالي
-  const [loading, setLoading] = useState(true); // بننتظر لحد ما نتأكد من الدخول
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // أول ما التطبيق يفتح: لو فيه توكن محفوظ، نجيب بيانات المستخدم
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setLoading(false);
-      return;
+  const refreshUser = async () => {
+    if (!tokenStore.getAccess()) {
+      setUser(null);
+      return null;
     }
-    api
-      .getMe()
-      .then((res) => setUser(res.user))
-      .catch(() => localStorage.removeItem("token")) // لو التوكن قديم نمسحه
-      .finally(() => setLoading(false));
-  }, []);
 
-  // تسجيل الدخول: نحفظ التوكن ونحط بيانات المستخدم
-  async function login(credentials) {
-    const res = await api.login(credentials);
-    localStorage.setItem("token", res.token);
-    setUser(res.user);
-    return res.user;
-  }
-
-  // تسجيل حساب جديد
-  async function register(data) {
-    const res = await api.register(data);
-    localStorage.setItem("token", res.token);
-    setUser(res.user);
-    return res.user;
-  }
-
-  // تسجيل الخروج: نمسح التوكن
-  function logout() {
-    localStorage.removeItem("token");
-    setUser(null);
-  }
-
-  // نحدّث بيانات المستخدم (مثلاً بعد ما ياخد نقاط)
-  async function refreshUser() {
     try {
       const res = await api.getMe();
-      setUser(res.user);
-    } catch {
+      const userData = normalizeUser(res);
+      setUser(userData);
+      return userData;
+    } catch (err) {
+      console.error("Session validation failed:", err);
+      tokenStore.clear();
       setUser(null);
+      return null;
     }
-  }
+  };
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      if (!tokenStore.getAccess()) {
+        setLoading(false);
+        return;
+      }
+
+      await refreshUser();
+      setLoading(false);
+    };
+
+    initializeAuth();
+  }, []);
+
+  const login = async (credentials) => {
+    setLoading(true);
+    try {
+      const res = await api.login(credentials);
+      const accessToken = res?.accessToken || res?.data?.accessToken;
+      const refreshToken = res?.refreshToken || res?.data?.refreshToken;
+
+      tokenStore.set(accessToken, refreshToken);
+
+      const userData = normalizeUser(res?.user || res?.data?.user || res);
+      setUser(userData);
+      return userData;
+    } catch (err) {
+      console.error("Login failed:", err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (userData) => {
+    setLoading(true);
+    try {
+      const res = await api.register(userData);
+      const accessToken = res?.accessToken || res?.data?.accessToken;
+      const refreshToken = res?.refreshToken || res?.data?.refreshToken;
+
+      tokenStore.set(accessToken, refreshToken);
+
+      const userObj = normalizeUser(res?.user || res?.data?.user || res);
+      setUser(userObj);
+      return userObj;
+    } catch (err) {
+      console.error("Registration failed:", err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    setLoading(true);
+    try {
+      await api.logout?.();
+    } catch (err) {
+      console.error("Logout API call failed:", err);
+    } finally {
+      tokenStore.clear();
+      setUser(null);
+      setLoading(false);
+    }
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
@@ -61,7 +111,9 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
-  return ctx;
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }

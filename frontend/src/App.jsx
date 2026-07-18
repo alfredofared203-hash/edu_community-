@@ -16,10 +16,14 @@ import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
+import RoleHome from "./components/RoleHome";
+import SoftSkillsPage from "./features/softskills/SoftSkillsPage";
+import StudentDashboard from "./pages/StudentDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import ChatPage from "./features/chat/ChatPage";
 
 const queryClient = new QueryClient();
 
-// ملاحظة: ده الـ baseline (الفيز الأولى والتانية). الفيز 3 و4 هيضيفهم التيم.
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -29,6 +33,10 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/home" element={<RoleHome />} />
+            <Route path="/dashboard/student" element={<ProtectedRoute roles={["student"]}><AppLayout><StudentDashboard /></AppLayout></ProtectedRoute>} />
+            <Route path="/dashboard/teacher" element={<ProtectedRoute roles={["teacher"]}><AppLayout><TeacherDashboard /></AppLayout></ProtectedRoute>} />
+            <Route path="/dashboard/admin" element={<ProtectedRoute roles={["admin"]}><AppLayout><AdminDashboard /></AppLayout></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
 
             {/* أقسام عامة (تصفّح بدون تسجيل) */}
@@ -38,8 +46,10 @@ const App = () => (
             <Route path="/teachers" element={<AppLayout><TeacherRating /></AppLayout>} />
 
             {/* أقسام تتطلب تسجيل دخول */}
+            <Route path="/softskills" element={<ProtectedRoute roles={["student"]}><AppLayout><SoftSkillsPage /></AppLayout></ProtectedRoute>} />
             <Route path="/materials" element={<ProtectedRoute><AppLayout><MaterialsPage /></AppLayout></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><AppLayout><ChatPage /></AppLayout></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute roles={["admin"]}><AppLayout><AdminDashboard /></AppLayout></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />

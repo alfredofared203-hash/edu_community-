@@ -59,7 +59,7 @@ function AuthForm() {
         });
         toast.success("تم إنشاء الحساب");
       }
-      navigate("/materials");
+      navigate("/home");
     } catch (err) {
       toast.error(err.message || "فشلت العملية");
     } finally {
