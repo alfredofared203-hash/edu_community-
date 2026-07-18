@@ -1,37 +1,53 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { api, tokenStore } from "../lib/api";
 
-const AuthContext = createContext(void 0);
+const AuthContext = createContext(undefined);
 
-const AuthProvider = ({ children }) => {
+const normalizeUser = (rawUser) => {
+  if (!rawUser) return null;
+  const userData = rawUser.user ?? rawUser;
+  if (!userData || typeof userData !== "object") return null;
+  return {
+    ...userData,
+    role: userData.role ? String(userData.role).toLowerCase() : userData.role,
+  };
+};
+
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const refreshUser = async () => {
     if (!tokenStore.getAccess()) {
       setUser(null);
-      setLoading(false);
-      return;
+      return null;
     }
+
     try {
       const res = await api.getMe();
-      const userData = res?.user || res; 
-      if (userData) {
-        setUser({ ...userData, role: userData.role?.toLowerCase() });
-      } else {
-        setUser(null);
-      }
+      const userData = normalizeUser(res);
+      setUser(userData);
+      return userData;
     } catch (err) {
       console.error("Session validation failed:", err);
       tokenStore.clear();
       setUser(null);
-    } finally {
-      setLoading(false);
+      return null;
     }
   };
 
   useEffect(() => {
-    refreshUser();
+    const initializeAuth = async () => {
+      if (!tokenStore.getAccess()) {
+        setLoading(false);
+        return;
+      }
+
+      await refreshUser();
+      setLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (credentials) => {
@@ -40,13 +56,12 @@ const AuthProvider = ({ children }) => {
       const res = await api.login(credentials);
       const accessToken = res?.accessToken || res?.data?.accessToken;
       const refreshToken = res?.refreshToken || res?.data?.refreshToken;
-      
+
       tokenStore.set(accessToken, refreshToken);
-      
-      const rawUser = res?.user || res?.data?.user || res;
-      const userObj = { ...rawUser, role: rawUser.role?.toLowerCase() };
-      setUser(userObj);
-      return userObj;
+
+      const userData = normalizeUser(res?.user || res?.data?.user || res);
+      setUser(userData);
+      return userData;
     } catch (err) {
       console.error("Login failed:", err);
       throw err;
@@ -63,9 +78,8 @@ const AuthProvider = ({ children }) => {
       const refreshToken = res?.refreshToken || res?.data?.refreshToken;
 
       tokenStore.set(accessToken, refreshToken);
-      
-      const rawUser = res?.user || res?.data?.user || res;
-      const userObj = { ...rawUser, role: rawUser.role?.toLowerCase() };
+
+      const userObj = normalizeUser(res?.user || res?.data?.user || res);
       setUser(userObj);
       return userObj;
     } catch (err) {
@@ -79,7 +93,7 @@ const AuthProvider = ({ children }) => {
   const logout = async () => {
     setLoading(true);
     try {
-      await api.logout();
+      await api.logout?.();
     } catch (err) {
       console.error("Logout API call failed:", err);
     } finally {
@@ -94,17 +108,12 @@ const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === void 0) {
+  if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-};
-
-export {
-  AuthProvider,
-  useAuth
-};
+}

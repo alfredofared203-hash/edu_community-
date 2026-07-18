@@ -26,7 +26,6 @@ const teacherRatingSchema = new mongoose.Schema({
   },
 });
 
-// Enforce unique ratings per student per teacher
 teacherRatingSchema.index({ teacherId: 1, studentId: 1 }, { unique: true });
 
 module.exports = mongoose.model('TeacherRating', teacherRatingSchema);

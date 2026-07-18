@@ -3,7 +3,7 @@ const User = require('../models/User');
 const TeacherRating = require('../models/TeacherRating');
 const { authenticate, authorize } = require('../middleware/auth.middleware');
 
-// Get teachers and their rating summaries
+
 router.get('/', async (req, res, next) => {
   try {
     const teachers = await User.aggregate([
@@ -42,7 +42,7 @@ router.get('/', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Submit/Update rating for a teacher
+
 router.post('/:id/rate', authenticate, authorize('student'), async (req, res, next) => {
   try {
     const { rating, comment } = req.body;

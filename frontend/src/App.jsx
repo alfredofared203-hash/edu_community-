@@ -21,19 +21,43 @@ import SoftSkillsPage from "./features/softskills/SoftSkillsPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import ChatPage from "./features/chat/ChatPage";
+
 const queryClient = new QueryClient();
-const App = () => <QueryClientProvider client={queryClient}><TooltipProvider><AuthProvider><Toaster /><Sonner /><BrowserRouter><Routes><Route path="/" element={<Landing />} /><Route path="/home" element={<RoleHome />} /><Route path="/dashboard/student" element={<ProtectedRoute roles={["student"]}><AppLayout><StudentDashboard /></AppLayout></ProtectedRoute>} /><Route path="/dashboard/teacher" element={<ProtectedRoute roles={["teacher"]}><AppLayout><TeacherDashboard /></AppLayout></ProtectedRoute>} /><Route path="/dashboard/admin" element={<ProtectedRoute roles={["admin"]}><AppLayout><AdminDashboard /></AppLayout></ProtectedRoute>} /><Route path="/auth" element={<Auth />} />{
-  /* أقسام عامة (تصفّح بدون تسجيل) */
-}<Route path="/feed" element={<AppLayout><Feed /></AppLayout>} /><Route path="/challenges" element={<AppLayout><Challenges /></AppLayout>} /><Route path="/leaderboard" element={<AppLayout><Leaderboard /></AppLayout>} /><Route path="/teachers" element={<AppLayout><TeacherRating /></AppLayout>} />{
-  /* أقسام تتطلب تسجيل دخول */
-}<Route path="/softskills" element={<ProtectedRoute roles={["student"]}><AppLayout><SoftSkillsPage /></AppLayout></ProtectedRoute>} /><Route
-  path="/materials"
-  element={<ProtectedRoute><AppLayout><MaterialsPage /></AppLayout></ProtectedRoute>}
-/><Route
-  path="/profile"
-  element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>}
-/><Route path="/chat" element={<ProtectedRoute><AppLayout><ChatPage /></AppLayout></ProtectedRoute>} /><Route path="*" element={<NotFound />} /></Routes></BrowserRouter></AuthProvider></TooltipProvider></QueryClientProvider>;
-var App_default = App;
-export {
-  App_default as default
-};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/home" element={<RoleHome />} />
+            <Route path="/dashboard/student" element={<ProtectedRoute roles={["student"]}><AppLayout><StudentDashboard /></AppLayout></ProtectedRoute>} />
+            <Route path="/dashboard/teacher" element={<ProtectedRoute roles={["teacher"]}><AppLayout><TeacherDashboard /></AppLayout></ProtectedRoute>} />
+            <Route path="/dashboard/admin" element={<ProtectedRoute roles={["admin"]}><AppLayout><AdminDashboard /></AppLayout></ProtectedRoute>} />
+            <Route path="/auth" element={<Auth />} />
+
+            {/* أقسام عامة (تصفّح بدون تسجيل) */}
+            <Route path="/feed" element={<AppLayout><Feed /></AppLayout>} />
+            <Route path="/challenges" element={<AppLayout><Challenges /></AppLayout>} />
+            <Route path="/leaderboard" element={<AppLayout><Leaderboard /></AppLayout>} />
+            <Route path="/teachers" element={<AppLayout><TeacherRating /></AppLayout>} />
+
+            {/* أقسام تتطلب تسجيل دخول */}
+            <Route path="/softskills" element={<ProtectedRoute roles={["student"]}><AppLayout><SoftSkillsPage /></AppLayout></ProtectedRoute>} />
+            <Route path="/materials" element={<ProtectedRoute><AppLayout><MaterialsPage /></AppLayout></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><AppLayout><ChatPage /></AppLayout></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute roles={["admin"]}><AppLayout><AdminDashboard /></AppLayout></ProtectedRoute>} />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;
