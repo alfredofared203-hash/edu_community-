@@ -1,5 +1,3 @@
-// خطأ موحّد للتطبيق: بيحمل status code + رسالة + تفاصيل اختيارية.
-// أي حتة في الكود ترمي ApiError، والـerror middleware يترجمها لرد منظّم.
 class ApiError extends Error {
   constructor(statusCode, message, errors = null) {
     super(message);

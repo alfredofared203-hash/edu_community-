@@ -4,7 +4,7 @@ const validate = require('../../middleware/validate.middleware');
 const { authenticate, authorize } = require('../../middleware/auth.middleware');
 const { createSubjectSchema } = require('../../validators/material.validator');
 
-router.get('/', ctrl.list); // تصفّح المواد متاح للجميع
+router.get('/', ctrl.list); 
 router.post('/', authenticate, authorize('teacher', 'admin'), validate(createSubjectSchema), ctrl.create);
 router.delete('/:id', authenticate, authorize('admin'), ctrl.remove);
 

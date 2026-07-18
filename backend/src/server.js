@@ -44,27 +44,22 @@ app.get('/api/health', (req, res) =>
   res.json({ success: true, service: 'EduCommunity Egypt API', version: '1.0', time: new Date() })
 );
 
-// ===== API v1 (المعمار الطبقي الجديد) =====
-// ⬇️ هذا المسار الآن يحتوي على /teachers تلقائياً عبر مجلد v1
-app.use('/api/v1', v1Routes);
+ app.use('/api/v1', v1Routes);
 
-// ===== API قديم (يُهاجَر تدريجياً للإصدار v1) =====
-app.use('/api/posts', postRoutes);
+ app.use('/api/posts', postRoutes);
 app.use('/api/challenges', challengeRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
-app.use('/api/admin', adminRoutes); // 👈 تم حذف app.use القديم للمدرسين من هنا
+app.use('/api/admin', adminRoutes);  
 
 
-// 404 + معالج الأخطاء المركزي (لازم في الآخر)
-app.use(notFound);
+ app.use(notFound);
 app.use(errorHandler);
 
 const server = app.listen(env.port, () =>
   console.log(`🚀 EduCommunity Egypt API running on http://localhost:${env.port}`)
 );
 
-// أمان: لو حصل promise rejection مش متعالج، نقفل بأمان
-process.on('unhandledRejection', (err) => {
+ process.on('unhandledRejection', (err) => {
   console.error('Unhandled Rejection:', err);
   server.close(() => process.exit(1));
 });

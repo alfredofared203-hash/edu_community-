@@ -5,8 +5,7 @@ const validate = require('../../middleware/validate.middleware');
 const { authenticate } = require('../../middleware/auth.middleware');
 const { registerSchema, loginSchema, refreshSchema } = require('../../validators/auth.validator');
 
-// حد للمحاولات على مسارات الدخول/التسجيل لمنع الـbrute-force
-const authLimiter = rateLimit({
+ const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 دقيقة
   max: 50,
   standardHeaders: true,

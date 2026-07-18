@@ -28,20 +28,16 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// تشفير كلمة المرور تلقائياً قبل الحفظ (فقط لو اتغيّرت).
-// ملاحظة: في Mongoose الحديث، الـhook الـasync بيرجّع Promise ومش بياخد next.
-userSchema.pre('save', async function () {
+ userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-// مقارنة كلمة مرور بنص عادي
-userSchema.methods.comparePassword = function (plain) {
+ userSchema.methods.comparePassword = function (plain) {
   return bcrypt.compare(plain, this.password);
 };
 
-// تنظيف الإخراج: _id => id وحذف الحقول الحساسة
-userSchema.set('toJSON', {
+ userSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,
   transform: (doc, ret) => {

@@ -1,4 +1,3 @@
-// Controller رفيع: يستقبل الطلب، ينده على الـservice، ويرجّع رد موحّد.
 const asyncHandler = require('../utils/asyncHandler');
 const { sendSuccess } = require('../utils/apiResponse');
 const authService = require('../services/auth.service');
@@ -24,6 +23,5 @@ exports.refresh = asyncHandler(async (req, res) => {
 });
 
 exports.logout = asyncHandler(async (req, res) => {
-  // التوكنات stateless، فالخروج بيتم بحذفها من جهة العميل.
   sendSuccess(res, { message: 'تم تسجيل الخروج' });
 });

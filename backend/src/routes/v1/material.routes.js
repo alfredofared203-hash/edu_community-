@@ -8,7 +8,6 @@ const { createMaterialSchema } = require('../../validators/material.validator');
 router.get('/', ctrl.list);
 router.get('/:id', ctrl.getOne);
 
-// الرفع للمدرس والأدمن فقط. ترتيب الـmiddleware: توكن -> دور -> ملف -> تحقق -> controller
 router.post(
   '/',
   authenticate,
