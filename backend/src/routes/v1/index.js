@@ -4,5 +4,6 @@ const router = require('express').Router();
 router.use('/auth', require('./auth.routes'));
 router.use('/subjects', require('./subject.routes'));
 router.use('/materials', require('./material.routes'));
+router.use('/softskills', require('./softskill.routes'));
 
 module.exports = router;

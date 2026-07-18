@@ -26,6 +26,8 @@ const allowed = [
   'image/webp',
   'video/mp4',
   'video/webm',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
 ];
 
 const fileFilter = (req, file, cb) => {

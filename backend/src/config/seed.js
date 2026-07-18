@@ -8,6 +8,7 @@ const ChallengeSubmission = require('../models/ChallengeSubmission');
 const TeacherRating = require('../models/TeacherRating');
 const Subject = require('../models/Subject');
 const Material = require('../models/Material');
+const SoftSkill = require('../models/SoftSkill');
 
 // كلمة مرور موحّدة للحسابات التجريبية — موديل User يشفّرها تلقائياً عند الحفظ
 const SEED_PASSWORD = 'password123';
@@ -76,6 +77,7 @@ async function seed() {
     await TeacherRating.deleteMany({});
     await Subject.deleteMany({});
     await Material.deleteMany({});
+    await SoftSkill.deleteMany({});
     console.log('🧹 Database collections cleared');
 
     // Create Admin (كلمة المرور بتتشفّر تلقائياً في موديل User)
@@ -187,6 +189,15 @@ async function seed() {
       content: 'أهلاً بك يا فاطمة، الانقسام الميتوزي ينتج خليتين متطابقتين تماماً للخلية الأم، بينما الميوزي ينتج 4 خلايا بكل منها نصف عدد الكروموسومات. سأقوم بنشر ملف ملخص كامل غداً!',
     });
     console.log('💬 Initial comments seeded');
+
+    // Create Soft Skills
+    await SoftSkill.insertMany([
+      { title: 'مهارات التواصل', description: 'فن إيصال الأفكار بوضوح وبناء جسور التفاهم مع الآخرين بفعالية.', icon: 'Users', color: 'blue', coursesCount: 12, createdBy: admin._id },
+      { title: 'القيادة الإيجابية', description: 'كيفية إلهام الفرق وتوجيه الطاقات نحو تحقيق الأهداف المشتركة برؤية واضحة.', icon: 'Award', color: 'emerald', coursesCount: 8, createdBy: admin._id },
+      { title: 'إدارة الوقت', description: 'تنظيم المهام وتحديد الأولويات لتحقيق أقصى إنتاجية بأقل جهد وتوتر.', icon: 'Clock', color: 'amber', coursesCount: 15, createdBy: admin._id },
+      { title: 'حل المشكلات', description: 'تطوير التفكير التحليلي والابتكاري لمواجهة التحديات بذكاء ومرونة.', icon: 'Lightbulb', color: 'indigo', coursesCount: 10, createdBy: admin._id },
+    ]);
+    console.log('🧠 Soft Skills seeded');
 
     console.log('🎉 Seeding successfully completed');
     process.exit(0);

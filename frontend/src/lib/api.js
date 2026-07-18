@@ -92,7 +92,12 @@ const api = {
   // ===== Admin (legacy) =====
   getAdminStats: () => request("/admin/stats"),
   getAdminUsers: () => request("/admin/users"),
-  deleteUser: (userId) => request(`/admin/users/${userId}`, { method: "DELETE" })
+  deleteUser: (userId) => request(`/admin/users/${userId}`, { method: "DELETE" }),
+  // ===== Soft Skills (v1) =====
+  getSoftSkills: () => request("/v1/softskills"),
+  getSoftSkillSubmissions: (skillId) => request(`/v1/softskills/${skillId}/submissions`),
+  submitPresentation: (skillId, formData) => request(`/v1/softskills/${skillId}/submit`, { method: "POST", body: formData }),
+  gradeSubmission: (submissionId, data) => request(`/v1/softskills/submissions/${submissionId}/grade`, { method: "POST", body: JSON.stringify(data) })
 };
 export {
   api,
