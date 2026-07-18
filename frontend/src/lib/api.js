@@ -33,17 +33,15 @@ const api = {
   getAdminStats: () => request("/admin/stats"),
   getAdminUsers: () => request("/admin/users"),
   deleteUser: (userId) => request(`/admin/users/${userId}`, { method: "DELETE" }),
-<<<<<<< HEAD
 
   getChatRooms: () => request("/v1/chat/rooms"),
   getRoomMessages: (room, params = {}) => request(`/v1/chat/${encodeURIComponent(room)}/messages${qs(params)}`),
-=======
+
   // ===== Soft Skills (v1) =====
   getSoftSkills: () => request("/v1/softskills"),
   getSoftSkillSubmissions: (skillId) => request(`/v1/softskills/${skillId}/submissions`),
   submitPresentation: (skillId, formData) => request(`/v1/softskills/${skillId}/submit`, { method: "POST", body: formData }),
   gradeSubmission: (submissionId, data) => request(`/v1/softskills/submissions/${submissionId}/grade`, { method: "POST", body: JSON.stringify(data) })
->>>>>>> 11009bc8c152d1a6ced2bba8b1b6b8c0a515855c
 };
 
 export {
