@@ -4,7 +4,7 @@ const ChallengeSubmission = require('../models/ChallengeSubmission');
 const User = require('../models/User');
 const { authenticate } = require('../middleware/auth.middleware');
 
-// Get all active challenges
+
 router.get('/', async (req, res, next) => {
   try {
     const challenges = await Challenge.find({ active: true }).sort({ endDate: 1 });
@@ -23,7 +23,7 @@ router.get('/', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Get submissions of the logged-in user
+
 router.get('/submissions', authenticate, async (req, res, next) => {
   try {
     const subs = await ChallengeSubmission.find({ userId: req.user.id });
@@ -31,14 +31,14 @@ router.get('/submissions', authenticate, async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Submit answer to a challenge
+
 router.post('/:id/submit', authenticate, async (req, res, next) => {
   try {
     const { answer } = req.body;
     const challenge = await Challenge.findById(req.params.id);
     if (!challenge) return res.status(404).json({ error: 'التحدي غير موجود' });
 
-    // Check duplicate submissions
+
     const duplicate = await ChallengeSubmission.findOne({
       challengeId: challenge._id,
       userId: req.user.id,
@@ -51,7 +51,7 @@ router.post('/:id/submit', authenticate, async (req, res, next) => {
       answer,
     });
 
-    // Increment points
+
     await User.findByIdAndUpdate(req.user.id, {
       $inc: { points: challenge.points },
     });
