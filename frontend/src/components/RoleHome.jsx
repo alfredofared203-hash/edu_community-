@@ -16,13 +16,13 @@ export default function RoleHome() {
 
     switch (user.role) {
       case "student":
-        navigate("/student-dashboard");
+        navigate("/dashboard/student");
         break;
       case "teacher":
-        navigate("/teacher-dashboard");
+        navigate("/dashboard/teacher");
         break;
       case "admin":
-        navigate("/admin");
+        navigate("/dashboard/admin");
         break;
       default:
         navigate("/feed");

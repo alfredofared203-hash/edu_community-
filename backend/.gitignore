@@ -1,25 +1,5 @@
-# Dependencies
-node_modules/
-
-# Environment
+node_modules
 .env
-.env.local
-.env.production
-
-# Build
-dist/
-build/
-
-# Logs
+uploads
 *.log
-
-# Uploads
-uploads/*
-
-# OS
 .DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/

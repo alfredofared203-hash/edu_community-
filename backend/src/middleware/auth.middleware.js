@@ -1,28 +1,26 @@
-// التحقق من التوكن (authenticate) + التحقق من الدور (authorize).
 const jwt = require('jsonwebtoken');
-const env = require('../config/env');
-const ApiError = require('../utils/ApiError');
 
-const authenticate = (req, res, next) => {
+
+function authenticate(req, res, next) {
   const header = req.headers.authorization;
   if (!header || !header.startsWith('Bearer ')) {
-    return next(ApiError.unauthorized('يجب تسجيل الدخول'));
+    return res.status(401).json({ error: 'يجب تسجيل الدخول أولاً' });
   }
   try {
-    const token = header.split(' ')[1];
-    req.user = jwt.verify(token, env.jwt.accessSecret);
+    const token = header.split(' ')[1];          
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();                                       
+  } catch (e) {
+    res.status(401).json({ error: 'توكن غير صالح أو منتهي' });
+  }
+}
+function authorize(...roles) {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'لا تملك صلاحية لهذا الإجراء' });
+    }
     next();
-  } catch (err) {
-    next(ApiError.unauthorized('توكن غير صالح أو منتهي الصلاحية'));
-  }
-};
-
-// authorize('teacher','admin') => يسمح فقط لهذه الأدوار
-const authorize = (...roles) => (req, res, next) => {
-  if (!req.user || !roles.includes(req.user.role)) {
-    return next(ApiError.forbidden('لا تملك صلاحية تنفيذ هذا الإجراء'));
-  }
-  next();
-};
+  };
+}
 
 module.exports = { authenticate, authorize };
