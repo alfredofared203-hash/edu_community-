@@ -13,6 +13,19 @@ const normalizeUser = (rawUser) => {
   };
 };
 
+const getAuthData = (response) => {
+  const payload = response?.data ?? response;
+  const accessToken = payload?.accessToken;
+  const refreshToken = payload?.refreshToken;
+  const user = normalizeUser(payload?.user);
+
+  if (!accessToken || !user?.name || !user?.role) {
+    throw new Error("استجابة تسجيل الدخول غير مكتملة. حاول تسجيل الدخول مرة أخرى.");
+  }
+
+  return { accessToken, refreshToken, user };
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -54,12 +67,9 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const res = await api.login(credentials);
-      const accessToken = res?.accessToken || res?.data?.accessToken;
-      const refreshToken = res?.refreshToken || res?.data?.refreshToken;
+      const { accessToken, refreshToken, user: userData } = getAuthData(res);
 
       tokenStore.set(accessToken, refreshToken);
-
-      const userData = normalizeUser(res?.user || res?.data?.user || res);
       setUser(userData);
       return userData;
     } catch (err) {
@@ -74,12 +84,9 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const res = await api.register(userData);
-      const accessToken = res?.accessToken || res?.data?.accessToken;
-      const refreshToken = res?.refreshToken || res?.data?.refreshToken;
+      const { accessToken, refreshToken, user: userObj } = getAuthData(res);
 
       tokenStore.set(accessToken, refreshToken);
-
-      const userObj = normalizeUser(res?.user || res?.data?.user || res);
       setUser(userObj);
       return userObj;
     } catch (err) {

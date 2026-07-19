@@ -118,10 +118,9 @@ function AuthForm() {
               <Label>نوع الحساب</Label>
               <Select value={role} onValueChange={setRole}>
                 <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[110]" dir="rtl">
                   <SelectItem value="student">طالب</SelectItem>
-                  <SelectItem value="teacher">معلم</SelectItem>
-                  <SelectItem value="admin">مدير مدرسة</SelectItem>
+                  <SelectItem value="teacher">مدرس</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -131,7 +130,7 @@ function AuthForm() {
                 <Label>المرحلة الدراسية</Label>
                 <Select value={grade} onValueChange={setGrade}>
                   <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-[110]" dir="rtl">
                     {GRADES.map((g) => (
                       <SelectItem key={g.value} value={g.value}>{g.label}</SelectItem>
                     ))}

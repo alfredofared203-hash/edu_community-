@@ -40,10 +40,12 @@ async function tryRefresh() {
     if (!res.ok) return false;
 
     const json = await res.json();
-    const newAccess = json?.data?.accessToken;
+    const refreshPayload = json?.data ?? json;
+    const newAccess = refreshPayload?.accessToken;
+    const newRefresh = refreshPayload?.refreshToken;
     if (!newAccess) return false;
 
-    tokenStore.set(newAccess);
+    tokenStore.set(newAccess, newRefresh);
     return true;
   } catch {
     return false;
@@ -66,5 +68,17 @@ export async function request(endpoint, options = {}, isRetry = false) {
   }
   
   const data = await response.json().catch(() => ({}));
+
+  // Do not treat a failed HTTP response as a successful API result.  In
+  // particular, authentication callers must not continue to the app with an
+  // `{ error: ... }` object in place of a user session.
+  if (!response.ok) {
+    const message = data?.error || data?.message || "تعذر إتمام الطلب. حاول مرة أخرى.";
+    const error = new Error(message);
+    error.status = response.status;
+    error.data = data;
+    throw error;
+  }
+
   return data;
 }

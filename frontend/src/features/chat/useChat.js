@@ -28,7 +28,9 @@ export function useChat(roomId) {
       .then((res) => {
         if (cancelled) return;
         const list = res?.messages || res?.items || res || [];
-        setMessages(Array.isArray(list) ? list : []);
+        // الباك بيرجّع الأحدث أولاً — نعكسها عشان تظهر بالترتيب الزمني (الأقدم فوق)
+        const chrono = Array.isArray(list) ? [...list].reverse() : [];
+        setMessages(chrono);
         setHasMore(Array.isArray(list) && list.length > 0);
       })
       .catch((e) => !cancelled && setError(e.message))
@@ -42,17 +44,13 @@ export function useChat(roomId) {
   useEffect(() => {
     if (!socket || !isConnected || !roomId) return;
 
-    // leave a previously-joined room if any (extensible for W2)
-    if (joinedRoomRef.current && joinedRoomRef.current !== roomId) {
-      socket.emit("leave_room", { room: joinedRoomRef.current });
-    }
-    socket.emit("join_room", { room: roomId });
+    // الباك بيستقبل اسم الصف (grade) كنص مباشر في join_room
+    socket.emit("join_room", roomId);
     joinedRoomRef.current = roomId;
 
-    const onNewMessage = (payload) => {
-      const msg = payload?.message || payload;
-      const room = payload?.room || msg?.room;
-      if (room && room !== roomId) return; // ignore other rooms
+    // الباك بيبثّ الرسالة كـ object مباشر (فيه grade)
+    const onNewMessage = (msg) => {
+      if (msg?.grade && msg.grade !== roomId) return; // تجاهل رسائل صف تاني
       setMessages((prev) => [...prev, msg]);
     };
 
@@ -67,7 +65,8 @@ export function useChat(roomId) {
     (text) => {
       const trimmed = (text || "").trim();
       if (!trimmed || !socket || !roomId) return;
-      socket.emit("send_message", { room: roomId, text: trimmed });
+      // الباك بيستقبل { grade, content }
+      socket.emit("send_message", { grade: roomId, content: trimmed });
     },
     [socket, roomId]
   );

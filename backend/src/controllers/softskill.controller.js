@@ -1,6 +1,7 @@
 const asyncHandler = require('../utils/asyncHandler');
 const { sendSuccess } = require('../utils/apiResponse');
 const service = require('../services/softskill.service');
+const notificationService = require('../services/notification.service');
 
 exports.list = asyncHandler(async (req, res) => {
   const skills = await service.list();
@@ -55,5 +56,15 @@ exports.grade = asyncHandler(async (req, res) => {
     feedback,
     teacherId: req.user.id,
   });
+
+  // نبعت إشعار لحظي للطالب إن تسليمه اتصحّح
+  await notificationService.notify(req.app.get('io'), {
+    user: submission.student,
+    type: 'grade',
+    title: 'تم تصحيح تسليمك',
+    body: `حصلت على درجة ${grade} في إحدى المهارات`,
+    link: '/softskills',
+  });
+
   sendSuccess(res, { message: 'تم حفظ الدرجة', data: { submission } });
 });

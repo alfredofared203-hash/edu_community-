@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, Users, GraduationCap, User } from "lucide-react";
-import { api } from "../../lib/api";
+import { useAuth } from "../../context/AuthContext";
+import { GRADES, gradeLabel } from "../../lib/grades";
 
 const TABS = [
   { id: "individual", label: "فردي", icon: User },
@@ -25,38 +26,26 @@ function timeShort(d) {
 }
 
 export default function ChatRoomList({ activeRoom, onSelect }) {
-  const [rooms, setRooms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [tab, setTab] = useState("individual");
+  const { user } = useAuth();
+  const loading = false;
+  const error = null;
+  const [tab, setTab] = useState("groups");
   const [query, setQuery] = useState("");
 
-  useEffect(() => {
-    let cancelled = false;
-    api
-      .getChatRooms()
-      .then((res) => {
-        if (cancelled) return;
-        const list = res?.rooms || res || [];
-        setRooms(Array.isArray(list) ? list : []);
-      })
-      .catch((e) => !cancelled && setError(e.message))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // الغرف = صفوف دراسية (شات جماعي لكل صف).
+  // الطالب يشوف صفّه بس · المدرس/الأدمن يشوف كل الصفوف.
+  const rooms = useMemo(() => {
+    if (!user) return [];
+    const list = user.role === "student"
+      ? [{ id: user.grade, isGroup: true }]
+      : GRADES.map((g) => ({ id: g.value, isGroup: true }));
+    return list.map((r) => ({ ...r, name: "شات " + gradeLabel(r.id) }));
+  }, [user]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return rooms.filter((r) => {
-      const name = (r.name || r.title || r._id || r.id || "").toString();
-      if (q && !name.toLowerCase().includes(q)) return false;
-      if (tab === "groups") return r.type === "group" || r.isGroup;
-      if (tab === "teachers") return r.type === "teacher" || r.role === "teacher" || name.includes("د.");
-      return !(r.type === "group" || r.isGroup || r.type === "teacher" || r.role === "teacher" || name.includes("د."));
-    });
-  }, [rooms, query, tab]);
+    return rooms.filter((r) => r.name.toLowerCase().includes(q));
+  }, [rooms, query]);
 
   return (
     <aside className="w-80 shrink-0 border-l border-gray-100 bg-white h-full flex flex-col" dir="rtl">

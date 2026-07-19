@@ -98,9 +98,6 @@ function ChatInner() {
 }
 
 export default function ChatPage() {
-  return (
-    <SocketProvider>
-      <ChatInner />
-    </SocketProvider>
-  );
+  // SocketProvider بقى على مستوى التطبيق كله (في App.jsx) عشان الإشعارات كمان تستخدمه
+  return <ChatInner />;
 }

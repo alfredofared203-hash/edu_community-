@@ -39,9 +39,13 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use((req, res) => res.status(404).json({ error: 'المسار غير موجود' }));
 
+// معالج الأخطاء المركزي — لازم يكون آخر middleware
+app.use(require('./middleware/error.middleware'));
+
 
 const httpServer = http.createServer(app);
-initSocket(httpServer);
+const io = initSocket(httpServer);
+app.set('io', io); // نخلي الـio متاح للكنترولرز عشان تبعت إشعارات لحظية
 
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => console.log(`http://localhost:${PORT}`));

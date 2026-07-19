@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import NotificationBell from "../features/notifications/NotificationBell";
 import {
   MessageSquare,
   Trophy,
@@ -21,6 +22,7 @@ const AppLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const userName = typeof user?.name === "string" && user.name.trim() ? user.name : "زائر";
   // \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062C\u0627\u0646\u0628\u064A\u0629 \u2014 \u0627\u0644\u0641\u064A\u0632 \u0627\u0644\u0623\u0648\u0644\u0649 \u0648\u0627\u0644\u062A\u0627\u0646\u064A\u0629 (baseline)
   const navItems = [
     { path: "/feed", label: "\u0627\u0644\u0645\u062C\u062A\u0645\u0639", icon: MessageSquare },
@@ -97,7 +99,7 @@ const AppLayout = ({ children }) => {
       onClick={() => setSidebarOpen(false)}
       className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"}`}
     ><item.icon className="w-5 h-5" />{item.label}{isActive && <div className="mr-auto w-1.5 h-1.5 rounded-full bg-sidebar-primary" />}</Link>;
-  })}</nav><div className="p-4 border-t border-sidebar-border"><div className="flex items-center gap-3 px-3 py-2"><div className="w-9 h-9 rounded-full gradient-accent flex items-center justify-center text-sm font-bold text-accent-foreground shrink-0">{user ? user.name.charAt(0) : "\u0632"}</div><div className="flex-1 min-w-0 font-medium"><p className="text-sm text-sidebar-foreground truncate">{user ? user.name : "\u0632\u0627\u0626\u0631"}</p><p className="text-xs text-sidebar-foreground/50 truncate">{user ? `${getGradeLabel(user.grade) || getRoleLabel(user.role)}` : "\u062A\u0635\u0641\u062D \u0645\u062D\u062F\u0648\u062F"}</p></div>{user ? <button
+  })}</nav><div className="p-4 border-t border-sidebar-border"><div className="flex items-center gap-3 px-3 py-2"><div className="w-9 h-9 rounded-full gradient-accent flex items-center justify-center text-sm font-bold text-accent-foreground shrink-0">{userName.charAt(0)}</div><div className="flex-1 min-w-0 font-medium"><p className="text-sm text-sidebar-foreground truncate">{userName}</p><p className="text-xs text-sidebar-foreground/50 truncate">{user ? `${getGradeLabel(user.grade) || getRoleLabel(user.role)}` : "\u062A\u0635\u0641\u062D \u0645\u062D\u062F\u0648\u062F"}</p></div>{user ? <button
     onClick={() => {
       logout();
       navigate("/");
@@ -109,7 +111,7 @@ const AppLayout = ({ children }) => {
                 </Link>}</div></div></div></aside><div className="flex-1 flex flex-col min-w-0"><header className="sticky top-0 z-30 glass-card border-b px-4 py-3 lg:px-6"><div className="flex items-center gap-4"><button
     className="lg:hidden text-muted-foreground hover:text-foreground"
     onClick={() => setSidebarOpen(true)}
-  ><Menu className="w-6 h-6" /></button><div className="flex-1" /><div className="flex items-center gap-2 text-sm text-muted-foreground"><div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/20 text-accent-foreground"><Trophy className="w-4 h-4 text-accent" /><span className="font-semibold">{user?.points || 0} نقطة</span></div></div></div></header><main className="flex-1 p-4 lg:p-8"><motion.div
+  ><Menu className="w-6 h-6" /></button><div className="flex-1" /><div className="flex items-center gap-2 text-sm text-muted-foreground"><NotificationBell /><div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/20 text-accent-foreground"><Trophy className="w-4 h-4 text-accent" /><span className="font-semibold">{user?.points || 0} نقطة</span></div></div></div></header><main className="flex-1 p-4 lg:p-8"><motion.div
     key={location.pathname}
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}

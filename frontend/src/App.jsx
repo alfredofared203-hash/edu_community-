@@ -17,6 +17,7 @@ import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
+import { SocketProvider } from "./context/SocketContext";
 import RoleHome from "./components/RoleHome";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
@@ -28,6 +29,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
+        <SocketProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
@@ -46,7 +48,7 @@ const App = () => (
             <Route path="/teachers" element={<AppLayout><TeacherRating /></AppLayout>} />
 
             {/* أقسام تتطلب تسجيل دخول */}
-            <Route path="/softskills" element={<ProtectedRoute roles={["student"]}><AppLayout><SoftSkillsPage /></AppLayout></ProtectedRoute>} />
+            <Route path="/soft-skills" element={<ProtectedRoute roles={["student"]}><AppLayout><SoftSkillsPage /></AppLayout></ProtectedRoute>} />
             <Route path="/materials" element={<ProtectedRoute><AppLayout><MaterialsPage /></AppLayout></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
             <Route path="/chat" element={<ProtectedRoute><AppLayout><ChatPage /></AppLayout></ProtectedRoute>} />
@@ -55,6 +57,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        </SocketProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
