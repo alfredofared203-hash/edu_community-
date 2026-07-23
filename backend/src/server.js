@@ -6,8 +6,9 @@ const morgan = require('morgan');
 const path = require('path');
 const connectDB = require('./config/db');
 const initSocket = require('./config/socket');
+const { validateAuthConfig } = require('./config/auth');
 
-
+validateAuthConfig();
 connectDB();
 
 const app = express();

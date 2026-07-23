@@ -3,23 +3,22 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { authenticate } = require('../middleware/auth.middleware');
+const { getJwtSecret, getRefreshSecret } = require('../config/auth');
 
 const router = express.Router();
 
 // ===== التوكنات =====
 // accessToken قصير (بيتبعت مع كل طلب) + refreshToken طويل (بيجيب access جديد).
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET + '_refresh';
-
 function makeAccessToken(user) {
   return jwt.sign(
     { id: user._id, role: user.role, name: user.name, grade: user.grade },
-    process.env.JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: '2h' }
   );
 }
 
 function makeRefreshToken(user) {
-  return jwt.sign({ id: user._id, type: 'refresh' }, REFRESH_SECRET, { expiresIn: '7d' });
+  return jwt.sign({ id: user._id, type: 'refresh' }, getRefreshSecret(), { expiresIn: '7d' });
 }
 
 // بنرجّع التوكنين مع بيانات المستخدم بالشكل اللي الفرونت متوقّعه
@@ -30,19 +29,26 @@ function authPayload(user) {
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role, grade, subject, schoolCode, nationalId } = req.body;
+    const normalizedName = typeof name === 'string' ? name.trim() : '';
+    const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+    const validRoles = ['student', 'teacher'];
 
-    if (!name || !email || !password) {
+    if (!normalizedName || !normalizedEmail || typeof password !== 'string' || !password) {
       return res.status(400).json({ error: 'الاسم والبريد وكلمة المرور مطلوبين' });
     }
+    if (password.length < 6) return res.status(400).json({ error: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' });
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) return res.status(400).json({ error: 'البريد الإلكتروني غير صحيح' });
+    if (role && !validRoles.includes(role)) return res.status(400).json({ error: 'نوع الحساب غير صالح' });
+    if ((role || 'student') === 'student' && !grade) return res.status(400).json({ error: 'المرحلة الدراسية مطلوبة للطالب' });
 
-    const exists = await User.findOne({ email: email.toLowerCase() });
+    const exists = await User.findOne({ email: normalizedEmail });
     if (exists) return res.status(409).json({ error: 'البريد مسجّل من قبل' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      name,
-      email: email.toLowerCase(),
+      name: normalizedName,
+      email: normalizedEmail,
       password: hashedPassword,
       role: role || 'student',
       grade,
@@ -83,7 +89,7 @@ router.post('/refresh', async (req, res) => {
 
     let payload;
     try {
-      payload = jwt.verify(refreshToken, REFRESH_SECRET);
+      payload = jwt.verify(refreshToken, getRefreshSecret());
     } catch (e) {
       return res.status(401).json({ error: 'انتهت الجلسة — سجّل دخول من جديد' });
     }

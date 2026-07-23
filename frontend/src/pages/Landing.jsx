@@ -112,6 +112,10 @@ const Landing = () => {
       toast.error("\u064A\u0631\u062C\u0649 \u0645\u0644\u0621 \u0627\u0644\u0628\u0631\u064A\u062F \u0627\u0644\u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A \u0648\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631");
       return;
     }
+    if (!isLogin && password.length < 6) {
+      toast.error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+      return;
+    }
     setIsSubmitting(true);
     try {
       if (isLogin) {
@@ -120,7 +124,7 @@ const Landing = () => {
         setShowAuth(false);
         navigate("/feed");
       } else {
-        if (!fullName || !role) {
+        if (!fullName || !role || (role === "student" && !grade)) {
           toast.error("\u064A\u0631\u062C\u0649 \u0645\u0644\u0621 \u062C\u0645\u064A\u0639 \u0627\u0644\u062D\u0642\u0648\u0644 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629");
           setIsSubmitting(false);
           return;
